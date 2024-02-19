@@ -1,0 +1,152 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
+// Broj elemenata parkour staze
+int n;
+// Broj ograničenja
+int m;
+// Matrica ograničenja
+int matrica_ogranicenja[2005][2005];
+// Polje za spremanje broja ulaznih grana za svaki čvor
+int ulazni_stupci[2005];
+// Lista sortiranih čvorova
+vector<int> sortirani_cvorovi;
+// Lista čvorova koji nemaju ulaznih grana
+queue<int> cvorovi_bez_ulaznih_grana;
+
+int main() {
+    // Unos broja elemenata i ograničenja
+    cin >> n >> m;
+
+    // Unos ograničenja
+    for (int i = 0; i < m; i++) {
+        int a, b;
+        cin >> a >> b;
+        // Postavljanje vrijednosti 1 u matrici_ogranicenja[b][a]
+        // označava da je potrebno proći element b prije a
+        matrica_ogranicenja[b][a] = 1;
+        // Povećavanje broja ulaznih grana za čvor a
+        ulazni_stupci[a]++;
+    }
+
+    // Stvaranje liste čvorova koji nemaju ulaznih grana
+    for (int i = 0; i < n; i++) {
+        if (ulazni_stupci[i] == 0) {
+            cvorovi_bez_ulaznih_grana.push(i);
+        }
+    }
+
+    // Dok god postoje čvorovi bez ulaznih grana, izvodimo topološko sortiranje
+    while (!cvorovi_bez_ulaznih_grana.empty()) {
+        // Uzimamo prvi čvor iz liste cvorovi_bez_ulaznih_grana
+        int trenutni_cvor = cvorovi_bez_ulaznih_grana.front();
+        cvorovi_bez_ulaznih_grana.pop();
+        // Dodajemo trenutni čvor u listu sortirani_cvorovi
+        sortirani_cvorovi.push_back(trenutni_cvor);
+
+        // Smanjujemo broj ulaznih grana za sve čvorove koji imaju granu prema trenutnom čvoru
+        for (int i = 0; i < n; i++) {
+            if (matrica_ogranicenja[i][trenutni_cvor] == 1) {
+                ulazni_stupci[i]--;
+                // Ako čvor i nakon smanjenja broja ulaznih grana nema više ulaznih grana, dodajmo ga u listu cvorovi_bez_ulaznih_grana
+		if (ulazni_stupci[i] == 0) {
+			cvorovi_bez_ulaznih_grana.push(i);
+		}
+	}
+}
+}
+
+// Ako je matrica_ogranicenja nakon topološkog sortiranja prazna, to znači da smo uspješno sortirali sve čvorove
+// Ako matrica_ogranicenja nije prazna, to znači da postoje cikličnosti u grafu i da nije moguće sortirati čvorove
+bool ciklicnost = false;
+for (int i = 0; i < n; i++) {
+    for (int j = 0; j < n; j++) {
+        if (matrica_ogranicenja[i][j] == 1) {
+            ciklicnost = true;
+        }
+    }
+}
+
+if (ciklicnost) {
+    cout << "-1" << endl;
+} else {
+    for (int i = 0; i < n; i++) {
+        cout << sortirani_cvorovi[i] << " ";
+    }
+    cout << endl;
+}
+
+return 0;
+
+
+
+Topološko sortiranje je postupak koji se koristi za sortiranje elemenata u neki direktni aciklični graf (DAG) tako da se elementi sortiraju u takav redoslijed da se elementi koji su navedeni u ograničenjima pojave prije elemenata koji su ovisni o njima.
+
+Korak po korak, ovako bi se rješenje ovog problema moglo implementirati:
+
+Stvorite nulu matricu matrica_ogranicenja veličine nxn, koja će se koristiti za spremanje informacija o ograničenjima.
+Pročitajte ulazne podatke i za svako ograničenje od a do b, postavite vrijednost 1 u čvoru matrice_ogranicenja[b][a]. Ovo će označiti da je potrebno proći element b prije a.
+Stvorite polje ulazni_stupci veličine n, koje će se koristiti za spremanje broja ulaznih grana za svaki čvor grafa.
+Prođite kroz matricu_ogranicenja i za svaki čvor, ako se na poziciji matrice_ogranicenja[i][j] nalazi vrijednost 1, povećajte brojač ulazni_stupci[j] za 1. Ovo će nam dati broj ulaznih grana za svaki čvor grafa.
+Stvorite listu sortirani_cvorovi koja će se koristiti za spremanje sortiranih čvorova.
+Stvorite praznu listu cvorovi_bez_ulaznih_grana koja će se koristiti za spremanje čvorova koji nemaju ulaznih grana.
+Prođite kroz polje ulazni_stupci i za svaki čvor koji nema ulaznih grana, dodajte ga u listu cvorovi_bez_ulaznih_grana.
+Dokle god je lista cvorovi_bez_ulaznih_grana nije prazna, slijedite ovaj postupak:
+Uzmite prvi čvor iz liste cvorovi_bez_ulaznih_grana i dodajte ga u listu sortirani_cvorovi.
+Prođite kroz matricu_ogranicenja i za svaki čvor koji ima granu prema čvoru koji ste uzeli iz liste cvorovi_bez_ulaznih_grana, smanjite vrijednost ulazni_stupci[j] za 1. Ako je ulazni_stupci[j] nakon toga postao 0, dodajte čvor j u listu cvorovi_bez_ulaznih_grana.
+
+Ako je u nekom trenutku lista cvorovi_bez_ulaznih_grana postala prazna, a matrica_ogranicenja nije prazna, to znači da postoji cikličnost u grafu i da nije moguće doći do rješenja. U tom slučaju, ispišite -1 i prekinite program.
+Ako je program uspješno završen, lista sortirani_cvorovi će sadržavati sortirani redoslijed elemenata koje je potrebno proći. Ispišite listu sortirani_cvorovi kao rješenje.
+
+
+#include <bits/stdc++.h>
+using namespace std;
+int n, m, matrica_ogranicenja[2005][2005], ulazni_stupci[2005];
+vector<int> sortirani_cvorovi;
+queue<int> cvorovi_bez_ulaznih_grana;
+int main() {
+    cin >> n >> m;
+    for (int i = 0; i < m; i++) {
+        int a, b;
+        cin >> a >> b;
+        matrica_ogranicenja[b][a] = 1;
+        ulazni_stupci[a]++;
+    }
+    for (int i = 0; i < n; i++) {
+        if (ulazni_stupci[i] == 0) {
+            cvorovi_bez_ulaznih_grana.push(i);
+        }
+    }
+    while (!cvorovi_bez_ulaznih_grana.empty()) {
+        int trenutni_cvor = cvorovi_bez_ulaznih_grana.front();
+        cvorovi_bez_ulaznih_grana.pop();
+        sortirani_cvorovi.push_back(trenutni_cvor);
+        for (int i = 0; i < n; i++) {
+            if (matrica_ogranicenja[i][trenutni_cvor] == 1) {
+                ulazni_stupci[i]--;
+                if (ulazni_stupci[i] == 0) {
+                    cvorovi_bez_ulaznih_grana.push(i);
+                }
+            }
+        }
+    }
+    bool ciklicnost = false;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            if (matrica_ogranicenja[i][j] == 1) {
+                ciklicnost = true;
+            }
+        }
+    }
+    if (ciklicnost) {
+        cout << "-1" << endl;
+    } else {
+        for (int i = 0; i < n; i++) {
+            cout << sortirani_cvorovi[i] << " ";
+        }
+        cout << endl;
+    }
+    return 0;
+}
+
